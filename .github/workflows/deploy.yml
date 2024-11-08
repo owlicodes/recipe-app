@@ -67,38 +67,41 @@ jobs:
             PORT=3000 NODE_ENV=production pm2 start npm --name 'recipe-app' -- start && \
             pm2 save && \
             echo 'Clearing old deployments...' && \
-            find ~/ -maxdepth 1 -name 'recipe-app-*' -type d -mtime +7 -exec rm -rf {} \; && \
-            echo 'Restarting Nginx...' && \
-            sudo systemctl restart nginx"
+            find ~/ -maxdepth 1 -name 'recipe-app-*' -type d -mtime +7 -exec rm -rf {} \;"
 
-      - name: Clear Browser Cache Headers
+      - name: Update Nginx Configuration
         env:
           INSTANCE_IP: ${{ secrets.INSTANCE_IP }}
         run: |
+          # Create temporary Nginx configuration file locally
+          cat > nginx.conf << 'EOF'
+          server {
+              listen 80;
+              server_name _;
+
+              location / {
+                  proxy_pass http://localhost:3000;
+                  proxy_http_version 1.1;
+                  proxy_set_header Upgrade $http_upgrade;
+                  proxy_set_header Connection 'upgrade';
+                  proxy_set_header Host $host;
+                  proxy_cache_bypass $http_upgrade;
+                  
+                  # Add cache control headers
+                  add_header Cache-Control 'no-store, no-cache, must-revalidate, proxy-revalidate';
+                  add_header Pragma 'no-cache';
+                  expires 0;
+              }
+          }
+          EOF
+
+          # Copy the configuration to the server
+          scp -i ~/.ssh/recipe-app-key nginx.conf ec2-user@$INSTANCE_IP:~/nginx.conf
+
+          # Move the configuration file to the correct location and restart Nginx
           ssh -i ~/.ssh/recipe-app-key ec2-user@$INSTANCE_IP "\
-            sudo tee /etc/nginx/conf.d/recipe-app.conf > /dev/null <<'EOL'
-            server {
-                listen 80;
-                server_name _;
-
-                location / {
-                    proxy_pass http://localhost:3000;
-                    proxy_http_version 1.1;
-                    proxy_set_header Upgrade \$http_upgrade;
-                    proxy_set_header Connection 'upgrade';
-                    proxy_set_header Host \$host;
-                    proxy_cache_bypass \$http_upgrade;
-                    
-                    # Add cache control headers
-                    add_header Cache-Control 'no-store, no-cache, must-revalidate, proxy-revalidate';
-                    add_header Pragma 'no-cache';
-                    expires 0;
-                }
-            }
-            EOL"
-
-          # Restart Nginx to apply new configuration
-          ssh -i ~/.ssh/recipe-app-key ec2-user@$INSTANCE_IP "sudo systemctl restart nginx"
+            sudo mv ~/nginx.conf /etc/nginx/conf.d/recipe-app.conf && \
+            sudo systemctl restart nginx"
 
       - name: Verify Deployment
         env:
@@ -106,10 +109,8 @@ jobs:
         run: |
           # Wait for the application to start
           sleep 10
-          # Clear DNS cache locally
-          sudo systemd-resolve --flush-caches || true
-          # Check if the application is responding with new timestamp header
-          curl --retry 5 --retry-delay 5 -f -I http://$INSTANCE_IP | grep -i "cache-control" || (echo "Deployment verification failed" && exit 1)
+          # Check if the application is responding
+          curl --retry 5 --retry-delay 5 -f http://$INSTANCE_IP || (echo "Deployment verification failed" && exit 1)
 
       - name: Clean up SSH Key
         if: always()

@@ -1,10 +1,9 @@
-# .github/workflows/deploy.yml
 name: Deploy Recipe App
 
 on:
   push:
     branches:
-      - main # Triggers deployment on push to main branch
+      - main
 
 jobs:
   deploy:
@@ -12,43 +11,70 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4 # Updated to latest version
 
       - name: Set up Node.js
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v4 # Updated to latest version
         with:
-          node-version: "20" # Specify your Node.js version
+          node-version: "20"
+          cache: "npm" # Added caching for faster builds
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci # Changed to 'npm ci' for more reliable installations
 
       - name: Build Recipe App
         run: npm run build
+        env:
+          NODE_ENV: production # Added production environment
 
       - name: Prepare SSH Key
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/recipe-app-key
           chmod 600 ~/.ssh/recipe-app-key
+          # Add server's public key to known hosts to avoid first-time connection issues
+          ssh-keyscan -H ${{ secrets.INSTANCE_IP }} >> ~/.ssh/known_hosts
 
       - name: Deploy to EC2
         env:
           INSTANCE_IP: ${{ secrets.INSTANCE_IP }}
         run: |
-          echo "Deploying to $INSTANCE_IP..."
-          ssh -o StrictHostKeyChecking=no -i ~/.ssh/recipe-app-key ec2-user@$INSTANCE_IP "mkdir -p ~/recipe-app"
+          echo "Starting deployment to $INSTANCE_IP..."
 
-          # Copy files to the instance
-          scp -o StrictHostKeyChecking=no -i ~/.ssh/recipe-app-key package*.json ec2-user@$INSTANCE_IP:~/recipe-app/
-          scp -o StrictHostKeyChecking=no -i ~/.ssh/recipe-app-key -r .next ec2-user@$INSTANCE_IP:~/recipe-app/
-          # scp -o StrictHostKeyChecking=no -i ~/.ssh/recipe-app-key -r public ec2-user@$INSTANCE_IP:~/recipe-app/
+          # Create a temporary directory for deployment
+          ssh -i ~/.ssh/recipe-app-key ec2-user@$INSTANCE_IP "mkdir -p ~/recipe-app-temp"
 
-          # Install dependencies and restart the app with PM2
-          ssh -o StrictHostKeyChecking=no -i ~/.ssh/recipe-app-key ec2-user@$INSTANCE_IP "\
-            cd ~/recipe-app && \
-            npm install && \
+          # Copy files to the temporary directory
+          echo "Copying files to server..."
+          scp -i ~/.ssh/recipe-app-key package*.json ec2-user@$INSTANCE_IP:~/recipe-app-temp/
+          scp -i ~/.ssh/recipe-app-key -r .next ec2-user@$INSTANCE_IP:~/recipe-app-temp/
+
+          # Deploy with zero downtime
+          ssh -i ~/.ssh/recipe-app-key ec2-user@$INSTANCE_IP "\
+            cd ~/recipe-app-temp && \
+            echo 'Installing dependencies...' && \
+            npm ci --production && \
+            echo 'Stopping previous application version...' && \
             pm2 delete recipe-app || true && \
-            PORT=3000 pm2 start npm --name 'recipe-app' -- start"
+            echo 'Moving new version into place...' && \
+            rm -rf ~/recipe-app && \
+            mv ~/recipe-app-temp ~/recipe-app && \
+            echo 'Starting new application version...' && \
+            cd ~/recipe-app && \
+            PORT=3000 pm2 start npm --name 'recipe-app' -- start && \
+            pm2 save && \
+            echo 'Restarting Nginx...' && \
+            sudo systemctl restart nginx"
+
+      - name: Verify Deployment
+        env:
+          INSTANCE_IP: ${{ secrets.INSTANCE_IP }}
+        run: |
+          # Wait for the application to start
+          sleep 10
+          # Check if the application is responding
+          curl --retry 5 --retry-delay 5 -f http://$INSTANCE_IP || (echo "Deployment verification failed" && exit 1)
 
       - name: Clean up SSH Key
+        if: always() # Run this step even if previous steps fail
         run: rm -f ~/.ssh/recipe-app-key

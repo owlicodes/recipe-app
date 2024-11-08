@@ -9,3 +9,8 @@ output "public_subnet_ids" {
 output "instance_public_ips" {
   value = aws_instance.recipe_app[*].public_ip
 }
+
+# Output the public DNS of the instance
+output "public_dns" {
+  value = aws_instance.recipe_app[*].public_dns
+}

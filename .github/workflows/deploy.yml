@@ -1,0 +1,54 @@
+# .github/workflows/deploy.yml
+name: Deploy Recipe App
+
+on:
+  push:
+    branches:
+      - main # Triggers deployment on push to main branch
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: "20" # Specify your Node.js version
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build Recipe App
+        run: npm run build
+
+      - name: Prepare SSH Key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/recipe-app-key
+          chmod 600 ~/.ssh/recipe-app-key
+
+      - name: Deploy to EC2
+        env:
+          INSTANCE_IP: ${{ secrets.INSTANCE_IP }}
+        run: |
+          echo "Deploying to $INSTANCE_IP..."
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/recipe-app-key ec2-user@$INSTANCE_IP "mkdir -p ~/recipe-app"
+
+          # Copy files to the instance
+          scp -o StrictHostKeyChecking=no -i ~/.ssh/recipe-app-key package*.json ec2-user@$INSTANCE_IP:~/recipe-app/
+          scp -o StrictHostKeyChecking=no -i ~/.ssh/recipe-app-key -r .next ec2-user@$INSTANCE_IP:~/recipe-app/
+          scp -o StrictHostKeyChecking=no -i ~/.ssh/recipe-app-key -r public ec2-user@$INSTANCE_IP:~/recipe-app/
+
+          # Install dependencies and restart the app with PM2
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/recipe-app-key ec2-user@$INSTANCE_IP "\
+            cd ~/recipe-app && \
+            npm install && \
+            pm2 delete recipe-app || true && \
+            PORT=3000 pm2 start npm --name 'recipe-app' -- start"
+
+      - name: Clean up SSH Key
+        run: rm -f ~/.ssh/recipe-app-key

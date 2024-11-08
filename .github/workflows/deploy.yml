@@ -11,28 +11,27 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4 # Updated to latest version
+        uses: actions/checkout@v4
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4 # Updated to latest version
+        uses: actions/setup-node@v4
         with:
           node-version: "20"
-          cache: "npm" # Added caching for faster builds
+          cache: "npm"
 
       - name: Install dependencies
-        run: npm ci # Changed to 'npm ci' for more reliable installations
+        run: npm ci
 
       - name: Build Recipe App
         run: npm run build
         env:
-          NODE_ENV: production # Added production environment
+          NODE_ENV: production
 
       - name: Prepare SSH Key
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/recipe-app-key
           chmod 600 ~/.ssh/recipe-app-key
-          # Add server's public key to known hosts to avoid first-time connection issues
           ssh-keyscan -H ${{ secrets.INSTANCE_IP }} >> ~/.ssh/known_hosts
 
       - name: Deploy to EC2
@@ -41,30 +40,65 @@ jobs:
         run: |
           echo "Starting deployment to $INSTANCE_IP..."
 
-          # Create a temporary directory for deployment
-          ssh -i ~/.ssh/recipe-app-key ec2-user@$INSTANCE_IP "mkdir -p ~/recipe-app-temp"
+          # Create a deployment timestamp
+          DEPLOY_TIMESTAMP=$(date +%Y%m%d_%H%M%S)
 
-          # Copy files to the temporary directory
+          # Create new directory with timestamp
+          ssh -i ~/.ssh/recipe-app-key ec2-user@$INSTANCE_IP "\
+            mkdir -p ~/recipe-app-$DEPLOY_TIMESTAMP"
+
+          # Copy files to the new directory
           echo "Copying files to server..."
-          scp -i ~/.ssh/recipe-app-key package*.json ec2-user@$INSTANCE_IP:~/recipe-app-temp/
-          scp -i ~/.ssh/recipe-app-key -r .next ec2-user@$INSTANCE_IP:~/recipe-app-temp/
+          scp -i ~/.ssh/recipe-app-key package*.json ec2-user@$INSTANCE_IP:~/recipe-app-$DEPLOY_TIMESTAMP/
+          scp -i ~/.ssh/recipe-app-key -r .next ec2-user@$INSTANCE_IP:~/recipe-app-$DEPLOY_TIMESTAMP/
 
           # Deploy with zero downtime
           ssh -i ~/.ssh/recipe-app-key ec2-user@$INSTANCE_IP "\
-            cd ~/recipe-app-temp && \
+            cd ~/recipe-app-$DEPLOY_TIMESTAMP && \
             echo 'Installing dependencies...' && \
             npm ci --production && \
             echo 'Stopping previous application version...' && \
             pm2 delete recipe-app || true && \
             echo 'Moving new version into place...' && \
             rm -rf ~/recipe-app && \
-            mv ~/recipe-app-temp ~/recipe-app && \
+            mv ~/recipe-app-$DEPLOY_TIMESTAMP ~/recipe-app && \
             echo 'Starting new application version...' && \
             cd ~/recipe-app && \
-            PORT=3000 pm2 start npm --name 'recipe-app' -- start && \
+            PORT=3000 NODE_ENV=production pm2 start npm --name 'recipe-app' -- start && \
             pm2 save && \
+            echo 'Clearing old deployments...' && \
+            find ~/ -maxdepth 1 -name 'recipe-app-*' -type d -mtime +7 -exec rm -rf {} \; && \
             echo 'Restarting Nginx...' && \
             sudo systemctl restart nginx"
+
+      - name: Clear Browser Cache Headers
+        env:
+          INSTANCE_IP: ${{ secrets.INSTANCE_IP }}
+        run: |
+          ssh -i ~/.ssh/recipe-app-key ec2-user@$INSTANCE_IP "\
+            sudo tee /etc/nginx/conf.d/recipe-app.conf > /dev/null <<'EOL'
+            server {
+                listen 80;
+                server_name _;
+
+                location / {
+                    proxy_pass http://localhost:3000;
+                    proxy_http_version 1.1;
+                    proxy_set_header Upgrade \$http_upgrade;
+                    proxy_set_header Connection 'upgrade';
+                    proxy_set_header Host \$host;
+                    proxy_cache_bypass \$http_upgrade;
+                    
+                    # Add cache control headers
+                    add_header Cache-Control 'no-store, no-cache, must-revalidate, proxy-revalidate';
+                    add_header Pragma 'no-cache';
+                    expires 0;
+                }
+            }
+            EOL"
+
+          # Restart Nginx to apply new configuration
+          ssh -i ~/.ssh/recipe-app-key ec2-user@$INSTANCE_IP "sudo systemctl restart nginx"
 
       - name: Verify Deployment
         env:
@@ -72,9 +106,11 @@ jobs:
         run: |
           # Wait for the application to start
           sleep 10
-          # Check if the application is responding
-          curl --retry 5 --retry-delay 5 -f http://$INSTANCE_IP || (echo "Deployment verification failed" && exit 1)
+          # Clear DNS cache locally
+          sudo systemd-resolve --flush-caches || true
+          # Check if the application is responding with new timestamp header
+          curl --retry 5 --retry-delay 5 -f -I http://$INSTANCE_IP | grep -i "cache-control" || (echo "Deployment verification failed" && exit 1)
 
       - name: Clean up SSH Key
-        if: always() # Run this step even if previous steps fail
+        if: always()
         run: rm -f ~/.ssh/recipe-app-key

@@ -28,27 +28,27 @@ jobs:
       - name: Prepare SSH Key
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/authorized_keys
-          chmod 600 ~/.ssh/authorized_keys
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/recipe-app-key
+          chmod 600 ~/.ssh/recipe-app-key
 
       - name: Deploy to EC2
         env:
           INSTANCE_IP: ${{ secrets.INSTANCE_IP }}
         run: |
           echo "Deploying to $INSTANCE_IP..."
-          ssh -o StrictHostKeyChecking=no -i ~/.ssh/authorized_keys ec2-user@$INSTANCE_IP "mkdir -p ~/recipe-app"
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/recipe-app-key ec2-user@$INSTANCE_IP "mkdir -p ~/recipe-app"
 
           # Copy files to the instance
-          scp -o StrictHostKeyChecking=no -i ~/.ssh/authorized_keys package*.json ec2-user@$INSTANCE_IP:~/recipe-app/
-          scp -o StrictHostKeyChecking=no -i ~/.ssh/authorized_keys -r .next ec2-user@$INSTANCE_IP:~/recipe-app/
-          scp -o StrictHostKeyChecking=no -i ~/.ssh/authorized_keys -r public ec2-user@$INSTANCE_IP:~/recipe-app/
+          scp -o StrictHostKeyChecking=no -i ~/.ssh/recipe-app-key package*.json ec2-user@$INSTANCE_IP:~/recipe-app/
+          scp -o StrictHostKeyChecking=no -i ~/.ssh/recipe-app-key -r .next ec2-user@$INSTANCE_IP:~/recipe-app/
+          scp -o StrictHostKeyChecking=no -i ~/.ssh/recipe-app-key -r public ec2-user@$INSTANCE_IP:~/recipe-app/
 
           # Install dependencies and restart the app with PM2
-          ssh -o StrictHostKeyChecking=no -i ~/.ssh/authorized_keys ec2-user@$INSTANCE_IP "\
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/recipe-app-key ec2-user@$INSTANCE_IP "\
             cd ~/recipe-app && \
             npm install && \
             pm2 delete recipe-app || true && \
             PORT=3000 pm2 start npm --name 'recipe-app' -- start"
 
       - name: Clean up SSH Key
-        run: rm -f ~/.ssh/authorized_keys
+        run: rm -f ~/.ssh/recipe-app-key

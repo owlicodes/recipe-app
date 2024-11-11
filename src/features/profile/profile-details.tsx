@@ -59,39 +59,6 @@ export const ProfileDetails = () => {
     },
   ];
 
-  const savedRecipes = [
-    {
-      id: 4,
-      title: "Classic Margherita Pizza",
-      description:
-        "A quick and flavorful Thai dish with chicken, basil, and chili.",
-      image: "/spicy-chicken.jpg",
-      postedBy: "ThaiFoodLover",
-      likes: 201,
-      comments: 34,
-    },
-    {
-      id: 5,
-      title: "Chocolate Lava Cake",
-      description:
-        "A quick and flavorful Thai dish with chicken, basil, and chili.",
-      image: "/mushroom-risoto.jpg",
-      postedBy: "ThaiFoodLover",
-      likes: 178,
-      comments: 27,
-    },
-    {
-      id: 6,
-      title: "Greek Salad",
-      description:
-        "A quick and flavorful Thai dish with chicken, basil, and chili.",
-      image: "/spicy-chicken.jpg",
-      postedBy: "ThaiFoodLover",
-      likes: 87,
-      comments: 9,
-    },
-  ];
-
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="space-y-4">

@@ -11,8 +11,8 @@ import {
 } from "@/components/ui/select";
 
 export const RecipeFilter = () => {
-  const [cuisine, setCuisine] = useState("");
-  const [diet, setDiet] = useState("");
+  const [, setCuisine] = useState("");
+  const [, setDiet] = useState("");
 
   return (
     <div className="mb-8 flex flex-wrap gap-4">

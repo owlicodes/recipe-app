@@ -202,7 +202,7 @@ export const RecipeForm = () => {
               type="button"
               onClick={() => {
                 const input = document.querySelector(
-                  'input[placeholder="Add a tag"]'
+                  "input[placeholder='Add a tag']"
                 ) as HTMLInputElement;
                 addTag(input.value);
                 input.value = "";

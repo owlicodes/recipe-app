@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 
 import { BookmarkPlus, Heart, MessageCircle } from "lucide-react";
@@ -25,9 +26,11 @@ export const RecipeCard = ({ recipe, disableBookmark }: RecipeCardProps) => {
           <CardTitle>{recipe.title}</CardTitle>
         </CardHeader>
         <CardContent>
-          <img
+          <Image
             src={recipe.image}
             alt={recipe.title}
+            width={500}
+            height={500}
             className="mb-4 h-48 w-full rounded-md object-cover"
           />
           <p className="text-sm text-muted-foreground">{recipe.description}</p>

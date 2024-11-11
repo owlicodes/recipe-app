@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 import { SearchAndFilterRecipe } from "./search-and-filter-recipe";
 
 export const ExploreRecipes = () => {
@@ -69,9 +71,11 @@ export const ExploreRecipes = () => {
               key={category.name}
               className="relative overflow-hidden rounded-lg"
             >
-              <img
+              <Image
                 src={category.image}
                 alt={category.name}
+                width={500}
+                height={500}
                 className="h-32 w-full object-cover"
               />
               <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-40">
@@ -95,9 +99,11 @@ export const ExploreRecipes = () => {
               key={recipe.id}
               className="overflow-hidden rounded-lg border shadow-sm transition-shadow hover:shadow-md"
             >
-              <img
+              <Image
                 src={recipe.image}
                 alt={recipe.name}
+                width={500}
+                height={500}
                 className="h-48 w-full object-cover"
               />
               <div className="p-4">

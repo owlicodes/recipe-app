@@ -33,8 +33,8 @@ export const Sidebar = ({ children }: { children?: React.ReactNode }) => {
     <SidebarProvider>
       <div className="grid min-h-screen w-full grid-cols-[auto_1fr]">
         <UISidebar>
-          <SidebarHeader>
-            <h2 className="px-4 text-lg font-semibold tracking-tight text-brand">
+          <SidebarHeader className="bg-brand">
+            <h2 className="px-4 text-lg font-semibold tracking-tight text-white">
               RecipeApp Admin
             </h2>
           </SidebarHeader>
@@ -60,7 +60,7 @@ export const Sidebar = ({ children }: { children?: React.ReactNode }) => {
           <SidebarFooter>
             <SidebarMenu>
               <SidebarMenuItem>
-                <SidebarMenuButton>
+                <SidebarMenuButton className="bg-brand text-white">
                   <LogOut className="mr-2 h-4 w-4" />
                   Logout
                 </SidebarMenuButton>

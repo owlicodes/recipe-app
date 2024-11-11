@@ -74,7 +74,7 @@ export const RecipeComments = () => {
           placeholder="Add a comment..."
           value={newComment}
           onChange={(e) => setNewComment(e.target.value)}
-          className="mb-2"
+          className="mb-2 bg-white"
         />
         <Button variant="brand" onClick={handleCommentSubmit}>
           <Send className="mr-2 h-4 w-4" />

@@ -4,6 +4,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 import { RecipeCard } from "../recipes/recipe-card";
+import { SavedRecipes } from "../recipes/saved-recipes";
 
 export const ProfileDetails = () => {
   // Placeholder data
@@ -185,16 +186,7 @@ export const ProfileDetails = () => {
         </div>
 
         {/* Saved Recipes */}
-        <div>
-          <h2 className="mb-4 text-xl font-semibold text-brand">
-            Saved Recipes
-          </h2>
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {savedRecipes.map((recipe) => (
-              <RecipeCard key={recipe.id} recipe={recipe} disableBookmark />
-            ))}
-          </div>
-        </div>
+        <SavedRecipes />
       </div>
     </div>
   );

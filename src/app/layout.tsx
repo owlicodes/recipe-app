@@ -6,8 +6,8 @@ import { Header } from "@/features/common/header";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Next.js Starter App",
-  description: "A basic starter for next.js",
+  title: "Recipe App",
+  description: "A recipe web application created with Next.js",
 };
 
 export default function RootLayout({

@@ -4,13 +4,7 @@ import { Route } from "next";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-import {
-  FileText,
-  LayoutDashboard,
-  LogOut,
-  MessageSquare,
-  Users,
-} from "lucide-react";
+import { FileText, Home, LogOut, MessageSquare, Users } from "lucide-react";
 
 import {
   SidebarContent,
@@ -29,7 +23,7 @@ export const Sidebar = ({ children }: { children?: React.ReactNode }) => {
   const pathName = usePathname();
 
   const menuItems = [
-    { name: "Dashboard", icon: LayoutDashboard, href: "/admin/dashboard" },
+    { name: "Home", icon: Home, href: "/" },
     { name: "Posts", icon: FileText, href: "/admin/posts" },
     { name: "Comments", icon: MessageSquare, href: "/admin/comments" },
     { name: "Users", icon: Users, href: "/admin/users" },

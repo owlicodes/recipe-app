@@ -1,7 +1,5 @@
+import { UsersLists } from "@/features/admin/users/users-list";
+
 export default function AdminUsersPage() {
-  return (
-    <div>
-      <h1>Admin Users Page</h1>
-    </div>
-  );
+  return <UsersLists />;
 }

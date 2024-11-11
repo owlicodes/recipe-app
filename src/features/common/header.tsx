@@ -90,7 +90,7 @@ export const Header = () => {
                     <Link href="/settings">Settings</Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem>
-                    <Link href="/admin/dashboard">Admin Dashboard</Link>
+                    <Link href="/admin/posts">Admin Pages</Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem>

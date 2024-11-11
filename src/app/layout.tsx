@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 
+import { Dialog } from "@/features/common/dialog";
 import { Header } from "@/features/common/header";
 
 import "./globals.css";
@@ -23,6 +24,7 @@ export default function RootLayout({
         />
       </head>
       <body className="antialiased">
+        <Dialog />
         <Header />
         {children}
       </body>

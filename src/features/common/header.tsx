@@ -16,10 +16,23 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
+import useDialogConfigStore from "@/stores/dialog-store";
+
+import { SignInForm } from "../auth/sign-in-form";
 
 export const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const router = useRouter();
+  const { setDialogConfig } = useDialogConfigStore();
+
+  const showSignInForm = () =>
+    setDialogConfig({
+      open: true,
+      title: "Sign In",
+      description:
+        "Welcome back! Enter your credentials to sign back in, happy cooking!",
+      content: <SignInForm />,
+    });
 
   const handleSearch = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -72,7 +85,7 @@ export const Header = () => {
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="ml-4 flex items-center">
                     <Avatar className="h-8 w-8">
-                      <AvatarImage src="/placeholder-avatar.jpg" alt="User" />
+                      <AvatarImage src="/chef-user.jpg" alt="User" />
                       <AvatarFallback>U</AvatarFallback>
                     </Avatar>
                     <span className="ml-2 hidden lg:block">Username</span>
@@ -95,8 +108,12 @@ export const Header = () => {
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
-              <Button variant="ghost" className="w-full justify-start" asChild>
-                <Link href="/signin">Sign In</Link>
+              <Button
+                variant="ghost"
+                className="w-full justify-start"
+                onClick={showSignInForm}
+              >
+                Sign In
               </Button>
               <Button variant="ghost" className="w-full justify-start" asChild>
                 <Link href="/signup">Sign Up</Link>
@@ -138,8 +155,12 @@ export const Header = () => {
             <Button variant="ghost" className="w-full justify-start" asChild>
               <Link href="/saved">Saved Recipes</Link>
             </Button>
-            <Button variant="ghost" className="w-full justify-start" asChild>
-              <Link href="/signin">Sign In</Link>
+            <Button
+              variant="ghost"
+              className="w-full justify-start"
+              onClick={showSignInForm}
+            >
+              Sign In
             </Button>
             <Button variant="ghost" className="w-full justify-start" asChild>
               <Link href="/signup">Sign Up</Link>

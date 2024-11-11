@@ -1,5 +1,7 @@
 "use client";
 
+import { Route } from "next";
+import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 import {
@@ -27,10 +29,10 @@ export const Sidebar = ({ children }: { children?: React.ReactNode }) => {
   const pathName = usePathname();
 
   const menuItems = [
-    { name: "Dashboard", icon: LayoutDashboard },
-    { name: "Posts", icon: FileText },
-    { name: "Comments", icon: MessageSquare },
-    { name: "Users", icon: Users },
+    { name: "Dashboard", icon: LayoutDashboard, href: "/admin/dashboard" },
+    { name: "Posts", icon: FileText, href: "/admin/posts" },
+    { name: "Comments", icon: MessageSquare, href: "/admin/comments" },
+    { name: "Users", icon: Users, href: "/admin/users" },
   ];
 
   return (
@@ -49,8 +51,13 @@ export const Sidebar = ({ children }: { children?: React.ReactNode }) => {
                   <SidebarMenuButton
                     isActive={pathName.includes(item.name.toLowerCase())}
                   >
-                    <item.icon className="mr-2 h-4 w-4" />
-                    {item.name}
+                    <Link
+                      href={item.href as Route}
+                      className="flex items-center"
+                    >
+                      <item.icon className="mr-2 h-4 w-4" />
+                      {item.name}
+                    </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}

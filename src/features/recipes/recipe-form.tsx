@@ -67,7 +67,7 @@ export const RecipeForm = () => {
   };
 
   return (
-    <Card className="mx-auto my-4 max-w-2xl p-6">
+    <Card className="mx-auto my-4 max-w-5xl p-6">
       <form onSubmit={handleSubmit} className="space-y-8">
         <div>
           <h1 className="mb-4 text-2xl font-bold">Create/Edit Recipe</h1>

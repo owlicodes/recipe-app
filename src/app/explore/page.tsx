@@ -1,7 +1,5 @@
+import { ExploreRecipes } from "@/features/recipes/explore-recipes";
+
 export default function ExplorePage() {
-  return (
-    <div>
-      <h1>Explore Page</h1>
-    </div>
-  );
+  return <ExploreRecipes />;
 }

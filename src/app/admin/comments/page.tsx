@@ -1,7 +1,5 @@
+import { CommentsList } from "@/features/admin/comments/comments-list";
+
 export default function AdminCommentsPage() {
-  return (
-    <div>
-      <h1>Admin Comments Page</h1>
-    </div>
-  );
+  return <CommentsList />;
 }

@@ -37,7 +37,7 @@ export const Sidebar = ({ children }: { children?: React.ReactNode }) => {
 
   return (
     <SidebarProvider>
-      <div className="grid min-h-screen grid-cols-[auto_1fr]">
+      <div className="grid min-h-screen w-full grid-cols-[auto_1fr]">
         <UISidebar>
           <SidebarHeader>
             <h2 className="px-4 text-lg font-semibold tracking-tight text-brand">

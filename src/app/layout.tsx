@@ -24,7 +24,7 @@ export default function RootLayout({
       </head>
       <body className="antialiased">
         <Dialog />
-        {children}
+        <div>{children}</div>
       </body>
     </html>
   );

@@ -21,7 +21,7 @@ export const SearchRecipe = () => {
           type="search"
           name="search"
           placeholder="Search recipes..."
-          className="w-full pl-10"
+          className="w-full bg-white pl-10"
         />
         <Search
           className="absolute left-3 top-1/2 -translate-y-1/2 transform text-gray-400"

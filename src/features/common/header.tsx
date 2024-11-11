@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 
-import { Bell, ChevronDown, Menu, X } from "lucide-react";
+import { ChevronDown, Menu, X } from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -18,6 +18,7 @@ import useDialogConfigStore from "@/stores/dialog-store";
 
 import { SignInForm } from "../auth/sign-in-form";
 import { SignUpForm } from "../auth/sign-up-form";
+import { NotificationDropdown } from "../notifications/notification-dropdown";
 import { DesktopNav } from "./desktop-nav";
 import { SearchRecipe } from "./search-recipe";
 
@@ -56,10 +57,20 @@ export const Header = () => {
             <SearchRecipe />
             <DesktopNav />
             <div className="ml-4 flex items-center">
-              <Button variant="ghost" size="icon" className="relative">
-                <Bell className="h-5 w-5" />
-                <span className="absolute right-0 top-0 block h-2 w-2 rounded-full bg-red-400 ring-2 ring-white" />
-              </Button>
+              <NotificationDropdown
+                notifications={[
+                  {
+                    id: "1",
+                    message: "Chef Logro liked your recipe.",
+                    date: new Date().toISOString(),
+                  },
+                  {
+                    id: "2",
+                    message: "Chef Judy commented on your recipe.",
+                    date: new Date().toISOString(),
+                  },
+                ]}
+              />
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="ml-4 flex items-center">

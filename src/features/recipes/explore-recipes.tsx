@@ -60,7 +60,9 @@ export const ExploreRecipes = () => {
 
       {/* Featured Categories */}
       <div className="mb-12">
-        <h2 className="mb-4 text-2xl font-semibold">Featured Categories</h2>
+        <h2 className="mb-4 text-2xl font-semibold text-brand">
+          Featured Categories
+        </h2>
         <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
           {featuredCategories.map((category) => (
             <div
@@ -84,7 +86,9 @@ export const ExploreRecipes = () => {
 
       {/* Recipe Grid */}
       <div>
-        <h2 className="mb-4 text-2xl font-semibold">Discover Recipes</h2>
+        <h2 className="mb-4 text-2xl font-semibold text-brand">
+          Discover Recipes
+        </h2>
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {recipes.map((recipe) => (
             <div

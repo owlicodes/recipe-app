@@ -1,7 +1,5 @@
 "use client";
 
-import { useState } from "react";
-
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -28,17 +26,20 @@ const formSchema = z.object({
     .email({
       message: "Invalid email.",
     }),
-  password: z.string().min(1, {
-    message: "Password is required.",
+  name: z.string().trim().min(1, {
+    message: "Name is required.",
+  }),
+  password: z.string().min(8, {
+    message: "Password must be atleast 8 characters.",
   }),
 });
 
-export const SignInForm = () => {
-  const [isPending, setIsPending] = useState(false);
+export const SignUpForm = () => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       email: "",
+      name: "",
       password: "",
     },
   });
@@ -58,6 +59,19 @@ export const SignInForm = () => {
               <FormLabel>Email</FormLabel>
               <FormControl>
                 <Input type="email" autoComplete="off" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="name"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Name</FormLabel>
+              <FormControl>
+                <Input autoComplete="off" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>

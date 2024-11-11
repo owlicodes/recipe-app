@@ -19,6 +19,7 @@ import { Input } from "@/components/ui/input";
 import useDialogConfigStore from "@/stores/dialog-store";
 
 import { SignInForm } from "../auth/sign-in-form";
+import { SignUpForm } from "../auth/sign-up-form";
 
 export const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -32,6 +33,15 @@ export const Header = () => {
       description:
         "Welcome back! Enter your credentials to sign back in, happy cooking!",
       content: <SignInForm />,
+    });
+
+  const showSignUpForm = () =>
+    setDialogConfig({
+      open: true,
+      title: "Sign Up",
+      description:
+        "Welcome, enter your credentials so you can start using the application, happy cooking!",
+      content: <SignUpForm />,
     });
 
   const handleSearch = (event: React.FormEvent<HTMLFormElement>) => {
@@ -115,8 +125,12 @@ export const Header = () => {
               >
                 Sign In
               </Button>
-              <Button variant="ghost" className="w-full justify-start" asChild>
-                <Link href="/signup">Sign Up</Link>
+              <Button
+                variant="ghost"
+                className="w-full justify-start"
+                onClick={showSignUpForm}
+              >
+                Sign Up
               </Button>
             </div>
           </div>
@@ -162,8 +176,12 @@ export const Header = () => {
             >
               Sign In
             </Button>
-            <Button variant="ghost" className="w-full justify-start" asChild>
-              <Link href="/signup">Sign Up</Link>
+            <Button
+              variant="ghost"
+              className="w-full justify-start"
+              onClick={showSignUpForm}
+            >
+              Sign Up
             </Button>
           </div>
         </div>

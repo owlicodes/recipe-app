@@ -1,7 +1,3 @@
-"use client";
-
-import { useState } from "react";
-
 import { BookmarkPlus, Heart, MessageCircle } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
@@ -13,85 +9,16 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { popularTags, recipes } from "@/data";
 
-<style jsx global>{`
-  :root {
-    --primary: 60 100% 50%;
-    --primary-foreground: 60 10% 10%;
-  }
-`}</style>;
-
-// Mock data for demonstration
-const recipes = [
-  {
-    id: 1,
-    title: "Spicy Thai Basil Chicken",
-    description:
-      "A quick and flavorful Thai dish with chicken, basil, and chili.",
-    image: "/spicy-chicken.jpg",
-    postedBy: "ThaiFoodLover",
-    likes: 1200,
-    comments: 89,
-  },
-  {
-    id: 2,
-    title: "Creamy Mushroom Risotto",
-    description: "Rich and creamy Italian risotto with assorted mushrooms.",
-    image: "/mushroom-risoto.jpg",
-    postedBy: "ItalianChef",
-    likes: 980,
-    comments: 65,
-  },
-  // Add more recipe objects as needed
-];
-
-const popularTags = [
-  "#HealthyEating",
-  "#QuickMeals",
-  "#VeganRecipes",
-  "#ComfortFood",
-  "#SeasonalCooking",
-];
+import { RecipeFilter } from "./recipe-filter";
 
 export const DiscoverRecipes = () => {
-  const [cuisine, setCuisine] = useState("");
-  const [diet, setDiet] = useState("");
-
   return (
     <div className="container mx-auto max-w-7xl px-4 py-8">
       <h1 className="mb-8 text-3xl font-bold">Discover Recipes</h1>
 
-      {/* Filters & Categories */}
-      <div className="mb-8 flex flex-wrap gap-4">
-        <Select onValueChange={setCuisine}>
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Cuisine" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="italian">Italian</SelectItem>
-            <SelectItem value="thai">Thai</SelectItem>
-            <SelectItem value="mexican">Mexican</SelectItem>
-          </SelectContent>
-        </Select>
-
-        <Select onValueChange={setDiet}>
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Dietary Preference" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="vegetarian">Vegetarian</SelectItem>
-            <SelectItem value="vegan">Vegan</SelectItem>
-            <SelectItem value="gluten-free">Gluten-Free</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
+      <RecipeFilter />
 
       {/* Popular Tags */}
       <div className="mb-8">

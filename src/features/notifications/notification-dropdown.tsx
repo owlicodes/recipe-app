@@ -55,7 +55,7 @@ export const NotificationDropdown = ({
         ))}
         <DropdownMenuItem asChild>
           <Link
-            href="/"
+            href="/notifications"
             className="w-full text-center text-sm text-blue-600 hover:text-blue-800"
           >
             View all notifications

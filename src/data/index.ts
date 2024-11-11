@@ -1,4 +1,6 @@
-export const recipes = [
+import { TRecipe } from "./types";
+
+export const recipes: Array<TRecipe> = [
   {
     id: 1,
     title: "Spicy Thai Basil Chicken",
@@ -21,9 +23,9 @@ export const recipes = [
 ];
 
 export const popularTags = [
-  "#HealthyEating",
-  "#QuickMeals",
-  "#VeganRecipes",
-  "#ComfortFood",
-  "#SeasonalCooking",
+  "HealthyEating",
+  "QuickMeals",
+  "VeganRecipes",
+  "ComfortFood",
+  "SeasonalCooking",
 ];

@@ -1,7 +1,5 @@
+import { ProfileSettings } from "@/features/profile/profile-settings";
+
 export default function SettingsPage() {
-  return (
-    <div>
-      <h1>Settings Page</h1>
-    </div>
-  );
+  return <ProfileSettings />;
 }

@@ -77,7 +77,7 @@ export const NotificationsList = () => {
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Notifications</h1>
         <Button
-          variant="outline"
+          variant="destructive"
           onClick={clearAllNotifications}
           disabled={notifications.length === 0}
         >

@@ -14,9 +14,10 @@ import { TRecipe } from "@/data/types";
 
 type RecipeCardProps = {
   recipe: TRecipe;
+  disableBookmark?: boolean;
 };
 
-export const RecipeCard = ({ recipe }: RecipeCardProps) => {
+export const RecipeCard = ({ recipe, disableBookmark }: RecipeCardProps) => {
   return (
     <Link href={`/recipe/${recipe.id}`}>
       <Card key={recipe.id} className="shadow-md">
@@ -52,10 +53,12 @@ export const RecipeCard = ({ recipe }: RecipeCardProps) => {
               <span className="sr-only">Comment</span>
               <span className="ml-1">{recipe.comments}</span>
             </Button>
-            <Button variant="ghost" size="icon" aria-label="Save recipe">
-              <BookmarkPlus className="h-4 w-4 text-brand" />
-              <span className="sr-only">Save</span>
-            </Button>
+            {!disableBookmark && (
+              <Button variant="ghost" size="icon" aria-label="Save recipe">
+                <BookmarkPlus className="h-4 w-4 text-brand" />
+                <span className="sr-only">Save</span>
+              </Button>
+            )}
           </div>
         </CardFooter>
       </Card>

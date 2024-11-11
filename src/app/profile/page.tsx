@@ -1,7 +1,5 @@
+import { ProfileDetails } from "@/features/profile/profile-details";
+
 export default function ProfilePage() {
-  return (
-    <div>
-      <h1>Profile Page</h1>
-    </div>
-  );
+  return <ProfileDetails />;
 }

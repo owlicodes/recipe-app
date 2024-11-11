@@ -9,7 +9,12 @@ type SubmitButtonProps = {
 
 export const SubmitButton = ({ isPending, className }: SubmitButtonProps) => {
   return (
-    <Button type="submit" className={className} disabled={isPending}>
+    <Button
+      variant="brand"
+      type="submit"
+      className={className}
+      disabled={isPending}
+    >
       {isPending ? (
         <span className="flex items-center gap-2">
           <Loader className="h-4 w-4 animate-spin" />

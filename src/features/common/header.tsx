@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { ChevronDown, Menu, X } from "lucide-react";
@@ -14,17 +15,19 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { client } from "@/lib/client";
 import useDialogConfigStore from "@/stores/dialog-store";
 
 import { SignInForm } from "../auth/sign-in-form";
 import { SignUpForm } from "../auth/sign-up-form";
 import { NotificationDropdown } from "../notifications/notification-dropdown";
-import { DesktopNav } from "./desktop-nav";
 import { SearchRecipe } from "./search-recipe";
 
 export const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { setDialogConfig } = useDialogConfigStore();
+  const session = client.useSession();
+  const router = useRouter();
 
   const showSignInForm = () =>
     setDialogConfig({
@@ -44,6 +47,13 @@ export const Header = () => {
       content: <SignUpForm />,
     });
 
+  const signOut = async () => {
+    await client.signOut().then(() => {
+      router.push("/");
+      router.refresh();
+    });
+  };
+
   return (
     <header className="bg-brand text-white shadow">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -55,49 +65,72 @@ export const Header = () => {
           </div>
           <div className="hidden sm:ml-6 sm:flex sm:items-center">
             <SearchRecipe />
-            <DesktopNav />
-            <div className="ml-4 flex items-center">
-              <NotificationDropdown
-                notifications={[
-                  {
-                    id: "1",
-                    message: "Chef Logro liked your recipe.",
-                    date: new Date().toISOString(),
-                  },
-                  {
-                    id: "2",
-                    message: "Chef Judy commented on your recipe.",
-                    date: new Date().toISOString(),
-                  },
-                ]}
-              />
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="ml-4 flex items-center">
-                    <Avatar className="h-8 w-8">
-                      <AvatarImage src="/chef-user.jpg" alt="User" />
-                      <AvatarFallback>U</AvatarFallback>
-                    </Avatar>
-                    <span className="ml-2 hidden lg:block">Username</span>
-                    <ChevronDown className="ml-2 h-4 w-4" />
+            <nav className="hidden space-x-4 md:flex">
+              <Button variant="ghost" asChild>
+                <Link href="/explore">Explore</Link>
+              </Button>
+              {session.data?.user && (
+                <>
+                  <Button variant="ghost" asChild>
+                    <Link href="/create">Create Recipe</Link>
                   </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem>
-                    <Link href="/profile">My Profile</Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    <Link href="/settings">Settings</Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    <Link href="/admin/posts">Admin Pages</Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem>
-                    <Link href="/logout">Logout</Link>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+                  <Button variant="ghost" asChild>
+                    <Link href="/saved">Saved Recipes</Link>
+                  </Button>
+                </>
+              )}
+            </nav>
+            <div className="ml-4 flex items-center">
+              {session.data?.user && (
+                <>
+                  <NotificationDropdown
+                    notifications={[
+                      {
+                        id: "1",
+                        message: "Chef Logro liked your recipe.",
+                        date: new Date().toISOString(),
+                      },
+                      {
+                        id: "2",
+                        message: "Chef Judy commented on your recipe.",
+                        date: new Date().toISOString(),
+                      },
+                    ]}
+                  />
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        className="ml-4 flex items-center"
+                      >
+                        <Avatar className="h-8 w-8">
+                          <AvatarImage src="/chef-user.jpg" alt="User" />
+                          <AvatarFallback>U</AvatarFallback>
+                        </Avatar>
+                        <span className="ml-2 hidden lg:block">Username</span>
+                        <ChevronDown className="ml-2 h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem>
+                        <Link href="/profile">My Profile</Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem>
+                        <Link href="/settings">Settings</Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem>
+                        <Link href="/admin/posts">Admin Pages</Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem>
+                        <Button onClick={signOut} className="w-full">
+                          Sign Out
+                        </Button>
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </>
+              )}
               <Button
                 variant="ghost"
                 className="w-full justify-start"

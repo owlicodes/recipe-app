@@ -1,5 +1,8 @@
 "use client";
 
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -13,6 +16,9 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { useToast } from "@/hooks/use-toast";
+import { client } from "@/lib/client";
+import useDialogConfigStore from "@/stores/dialog-store";
 
 import { SubmitButton } from "../common/submit-button";
 
@@ -32,6 +38,7 @@ const formSchema = z.object({
 });
 
 export const SignInForm = () => {
+  const [isPending, setIsPending] = useState(false);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -39,9 +46,34 @@ export const SignInForm = () => {
       password: "",
     },
   });
+  const { setDialogConfig } = useDialogConfigStore();
+  const router = useRouter();
+  const { toast } = useToast();
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    console.log({ values });
+    await client.signIn.email(
+      {
+        ...values,
+      },
+      {
+        onRequest: () => {
+          setIsPending(true);
+        },
+        onSuccess: () => {
+          setIsPending(false);
+          setDialogConfig(undefined);
+          router.refresh();
+        },
+        onError: (ctx) => {
+          setIsPending(false);
+          toast({
+            title: "Sign In",
+            description: ctx.error.message,
+            variant: "destructive",
+          });
+        },
+      }
+    );
   };
 
   return (
@@ -73,7 +105,7 @@ export const SignInForm = () => {
             </FormItem>
           )}
         />
-        <SubmitButton isPending={false} />
+        <SubmitButton isPending={isPending} />
       </form>
     </Form>
   );

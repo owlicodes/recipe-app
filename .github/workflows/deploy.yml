@@ -41,7 +41,7 @@ jobs:
           # Copy files to the instance
           scp -o StrictHostKeyChecking=no -i ~/.ssh/recipe-app-key package*.json ec2-user@$INSTANCE_IP:~/recipe-app/
           scp -o StrictHostKeyChecking=no -i ~/.ssh/recipe-app-key -r .next ec2-user@$INSTANCE_IP:~/recipe-app/
-          # scp -o StrictHostKeyChecking=no -i ~/.ssh/recipe-app-key -r public ec2-user@$INSTANCE_IP:~/recipe-app/
+          scp -o StrictHostKeyChecking=no -i ~/.ssh/recipe-app-key -r public ec2-user@$INSTANCE_IP:~/recipe-app/
 
           # Install dependencies and restart the app with PM2
           ssh -o StrictHostKeyChecking=no -i ~/.ssh/recipe-app-key ec2-user@$INSTANCE_IP "\

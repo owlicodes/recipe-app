@@ -31,6 +31,13 @@ jobs:
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/recipe-app-key
           chmod 600 ~/.ssh/recipe-app-key
 
+      - name: Create .env file
+        run: |
+          echo "BETTER_AUTH_SECRET=${{ secrets.BETTER_AUTH_SECRET }}" >> env_temp
+          echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> env_temp
+          echo "BETTER_AUTH_URL=${{ vars.BETTER_AUTH_URL }}" >> env_temp
+          echo "NEXT_PUBLIC_BASE_URL=${{ vars.NEXT_PUBLIC_BASE_URL }}" >> env_temp
+
       - name: Deploy to EC2
         env:
           INSTANCE_IP: ${{ secrets.INSTANCE_IP }}
@@ -42,6 +49,7 @@ jobs:
           scp -o StrictHostKeyChecking=no -i ~/.ssh/recipe-app-key package*.json ec2-user@$INSTANCE_IP:~/recipe-app/
           scp -o StrictHostKeyChecking=no -i ~/.ssh/recipe-app-key -r .next ec2-user@$INSTANCE_IP:~/recipe-app/
           scp -o StrictHostKeyChecking=no -i ~/.ssh/recipe-app-key -r public ec2-user@$INSTANCE_IP:~/recipe-app/
+          scp -o StrictHostKeyChecking=no -i ~/.ssh/recipe-app-key env_temp ec2-user@$INSTANCE_IP:~/recipe-app/
 
           # Install dependencies and restart the app with PM2
           ssh -o StrictHostKeyChecking=no -i ~/.ssh/recipe-app-key ec2-user@$INSTANCE_IP "\

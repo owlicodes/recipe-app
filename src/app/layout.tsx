@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 
+import { Toaster } from "@/components/ui/toaster";
 import { Dialog } from "@/features/common/dialog";
 
 import "./globals.css";
@@ -23,6 +24,7 @@ export default function RootLayout({
         />
       </head>
       <body className="antialiased">
+        <Toaster />
         <Dialog />
         <div>{children}</div>
       </body>

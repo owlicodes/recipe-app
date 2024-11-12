@@ -118,9 +118,11 @@ export const Header = () => {
                       <DropdownMenuItem>
                         <Link href="/settings">Settings</Link>
                       </DropdownMenuItem>
-                      <DropdownMenuItem>
-                        <Link href="/admin/posts">Admin Pages</Link>
-                      </DropdownMenuItem>
+                      {session.data?.user.role === "admin" && (
+                        <DropdownMenuItem>
+                          <Link href="/admin/posts">Admin Pages</Link>
+                        </DropdownMenuItem>
+                      )}
                       <DropdownMenuSeparator />
                       <DropdownMenuItem>
                         <Button onClick={signOut} className="w-full">

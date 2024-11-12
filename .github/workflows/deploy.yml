@@ -1,10 +1,9 @@
-# .github/workflows/deploy.yml
 name: Deploy Recipe App
 
 on:
   push:
     branches:
-      - main # Triggers deployment on push to main branch
+      - main
 
 jobs:
   deploy:
@@ -17,7 +16,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: "20" # Specify your Node.js version
+          node-version: "20"
 
       - name: Install dependencies
         run: npm install
@@ -54,10 +53,14 @@ jobs:
           scp -o StrictHostKeyChecking=no -i ~/.ssh/recipe-app-key -r public ec2-user@$INSTANCE_IP:~/recipe-app/
           scp -o StrictHostKeyChecking=no -i ~/.ssh/recipe-app-key .env ec2-user@$INSTANCE_IP:~/recipe-app/
 
+          # Copy Prisma generated files
+          scp -o StrictHostKeyChecking=no -i ~/.ssh/recipe-app-key -r node_modules/.prisma ec2-user@$INSTANCE_IP:~/recipe-app/node_modules/
+          scp -o StrictHostKeyChecking=no -i ~/.ssh/recipe-app-key -r node_modules/@prisma ec2-user@$INSTANCE_IP:~/recipe-app/node_modules/
+
           # Install dependencies and restart the app with PM2
           ssh -o StrictHostKeyChecking=no -i ~/.ssh/recipe-app-key ec2-user@$INSTANCE_IP "\
             cd ~/recipe-app && \
-            npm install && \
+            npm install --omit=dev && \
             pm2 delete recipe-app || true && \
             PORT=3000 pm2 start npm --name 'recipe-app' -- start"
 
